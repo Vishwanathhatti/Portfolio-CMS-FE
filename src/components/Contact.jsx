@@ -1,14 +1,34 @@
 import { MapPin, Phone, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import ContactForm from "./ContactForm";
 
 const Contact = () => {
+  const { data: info } = useQuery({
+    queryKey: ['info'],
+    queryFn: async () => {
+      const response = await api.getInfo();
+      return response.data.data;
+    },
+  });
+
+  const contactMutation = useMutation({
+    mutationFn: (contactData) => api.createContact(contactData),
+    onSuccess: () => {
+      toast.success("Message sent successfully!");
+    },
+    onError: (error) => {
+      toast.error("Failed to send message. Please try again.");
+      console.error("Contact form error:", error);
+    },
+  });
+
   const contactInfo = [
-    { icon: MapPin, title: "Address", content: "Pune, Maharashtra, India" },
-    { icon: Phone, title: "Phone", content: "+91-8552866007" },
-    { icon: Mail, title: "Email", content: "vhatti14@gmail.com" }
+    { icon: MapPin, title: "Address", content: info?.address },
+    { icon: Phone, title: "Phone", content: info?.phone },
+    { icon: Mail, title: "Email", content: info?.email }
   ];
 
   const containerVariants = {
@@ -84,15 +104,7 @@ const Contact = () => {
             transition={{ duration: 0.6 }}
             className="bg-card p-8 rounded-2xl shadow-lg"
           >
-            <form className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <Input placeholder="Name" className="rounded-xl" />
-                <Input type="email" placeholder="Email" className="rounded-xl" />
-              </div>
-              <Input placeholder="Subject" className="rounded-xl" />
-              <Textarea placeholder="Message" rows={6} className="rounded-xl" />
-              <Button className="w-full rounded-full">Send Message</Button>
-            </form>
+            <ContactForm onSubmit={contactMutation.mutate} isLoading={contactMutation.isPending} />
           </motion.div>
         </div>
       </div>

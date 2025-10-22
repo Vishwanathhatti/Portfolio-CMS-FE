@@ -1,8 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import heroImage from "@/assets/hero-image.jpg";
 
 const Hero = () => {
+  const { data: info, isLoading } = useQuery({
+    queryKey: ['info'],
+    queryFn: async () => {
+      const response = await api.getInfo();
+      return response.data.data;
+    },
+  });
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -32,18 +42,18 @@ const Hero = () => {
             animate="visible"
             variants={fadeInUp}
           >
-            <motion.h1 
+            <motion.h1
               className="text-5xl md:text-6xl font-bold mb-6"
               variants={fadeInUp}
             >
               Hello, I'm<br />
-              <span className="text-primary">Vishwanath Hatti</span>
+              <span className="text-primary">{info?.name}</span>
             </motion.h1>
-            <motion.p 
+            <motion.p
               className="text-lg text-muted-foreground mb-8 max-w-lg"
               variants={fadeInUp}
             >
-              Full-Stack Developer with hands-on experience building scalable web applications using MERN Stack, FastAPI, and PostgreSQL. Passionate about delivering efficient, user-focused solutions and contributing to impactful projects.
+              {info?.headerContent}
             </motion.p>
             <motion.div variants={fadeInUp}>
               <Button size="lg" className="rounded-full px-8">
@@ -51,7 +61,7 @@ const Hero = () => {
               </Button>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="grid grid-cols-3 gap-8 mt-12"
               variants={staggerContainer}
               initial="hidden"
@@ -62,7 +72,7 @@ const Hero = () => {
                 { value: "10+", label: "Projects Completed" },
                 { value: "5+", label: "Happy Clients" }
               ].map((stat, index) => (
-                <motion.div 
+                <motion.div
                   key={index}
                   variants={fadeInUp}
                   className="bg-card p-6 rounded-2xl shadow-sm"
@@ -75,15 +85,15 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="flex justify-center"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <img 
-              src={heroImage} 
-              alt="Vishwanath Hatti - Full Stack Developer" 
+            <img
+              src={info?.headerImgUrl ? `${import.meta.env.VITE_API_BASE_URL}/${info.headerImgUrl}` : heroImage}
+              alt={`${info?.name} - Full Stack Developer`}
               className="w-full max-w-md rounded-3xl object-cover"
             />
           </motion.div>

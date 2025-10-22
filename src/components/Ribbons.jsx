@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Renderer, Transform, Vec3, Color, Polyline } from 'ogl';
 
-import './Ribbons.css';
-
 const Ribbons = ({
   colors = ['#FC8EAC'],
   baseSpring = 0.03,
@@ -236,7 +234,7 @@ const Ribbons = ({
     backgroundColor
   ]);
 
-  return <div ref={containerRef} className="ribbons-container" />;
+  return <div ref={containerRef} className="relative w-full h-full" />;
 };
 
 export default Ribbons;

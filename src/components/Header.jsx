@@ -4,13 +4,36 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ScrollProgress from "./ScrollProgress";
+import {api} from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
   const isHomePage = location.pathname === '/';
-  
+
+  const { data: info } = useQuery({
+    queryKey: ['info'],
+    queryFn: async () => {
+      const response = await api.getInfo();
+      return response.data.data;
+    },
+  });
+
+  const downloadCV = () => {
+    if (info?.cv) {
+      const link = document.createElement('a');
+      link.href = `${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}${info.cv}`;
+      link.setAttribute('download', 'Vishwanath_Hatti_CV.pdf');
+      link.setAttribute('target', '_blank');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const scrollToSection = (id) => {
     if (!isHomePage) {
       navigate('/');
@@ -60,7 +83,9 @@ const Header = () => {
             ))}
           </nav>
 
-          <Button className="hidden md:inline-flex">Download CV</Button>
+          <Button className="hidden md:inline-flex" onClick={downloadCV}>
+            Download CV
+          </Button>
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild className="md:hidden">
@@ -79,7 +104,9 @@ const Header = () => {
                     {item.label}
                   </button>
                 ))}
-                <Button className="mt-4 w-full">Download CV</Button>
+                <Button className="mt-4 w-full" onClick={downloadCV}>
+                  Download CV
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>

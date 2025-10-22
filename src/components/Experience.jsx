@@ -1,45 +1,30 @@
 import { motion } from "framer-motion";
 import { Briefcase, Calendar, GraduationCap } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 const Experience = () => {
-  const experiences = [
-    {
-      title: "Full Stack Development Intern",
-      company: "Shakham Inc",
-      location: "Pune, India",
-      period: "July 2024 – Present",
-      type: "work",
-      achievements: [
-        "Developed full-stack applications using FastAPI, PostgreSQL, and React.js, ensuring 99% uptime",
-        "Designed and implemented RESTful APIs for efficient data communication",
-        "Collaborated with cross-functional teams to deliver scalable solutions"
-      ]
+  const { data: experiences, isLoading } = useQuery({
+    queryKey: ['experiences'],
+    queryFn: async () => {
+      const response = await api.getExperiences();
+      return response.data.data;
     },
-    {
-      title: "Master of Computer Application",
-      company: "Savitribai Phule Pune University",
-      location: "Pune, India",
-      period: "2023 – 2025",
-      type: "education",
-      achievements: [
-        "CGPA: 9.20/10",
-        "Focus on Full-Stack Development and Cloud Technologies",
-        "Active participation in technical projects and hackathons"
-      ]
-    },
-    {
-      title: "Bachelor of Computer Application",
-      company: "Karnataka State Akkamahadevi Women's University",
-      location: "Vijayapura, India",
-      period: "2020 – 2023",
-      type: "education",
-      achievements: [
-        "CGPA: 8.75/10",
-        "Foundation in Computer Science and Software Development",
-        "Led multiple academic projects and presentations"
-      ]
-    }
-  ];
+  });
+
+  const defaultExperiences = [];
+
+  const displayExperiences = experiences && experiences.length > 0 ? experiences.map(exp => ({
+    _id: exp._id,
+    title: exp.role,
+    company: exp.companyName,
+    location: "Pune, India", // Default location since not in model
+    period: exp.endDate
+      ? `${new Date(exp.startDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} – ${new Date(exp.endDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
+      : `${new Date(exp.startDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} – Present`,
+    type: "work", // Default to work since not in model
+    achievements: exp.desc || []
+  })) : defaultExperiences;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -109,13 +94,13 @@ const Experience = () => {
           {/* Timeline line */}
           <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-primary/20 hidden md:block" />
 
-          {experiences.map((exp, index) => {
+          {displayExperiences.map((exp, index) => {
             const isLeft = index % 2 === 0;
             const Icon = exp.type === 'work' ? Briefcase : GraduationCap;
-            
+
             return (
               <motion.div
-                key={index}
+                key={exp._id || index}
                 variants={isLeft ? leftItemVariants : rightItemVariants}
                 className={`relative mb-12 md:mb-16 flex ${
                   isLeft ? 'md:flex-row' : 'md:flex-row-reverse'
@@ -149,7 +134,7 @@ const Experience = () => {
                       </div>
                     </div>
                     <ul className="space-y-2">
-                      {exp.achievements.map((achievement, idx) => (
+                      {exp.achievements && exp.achievements.map((achievement, idx) => (
                         <motion.li
                           key={idx}
                           initial={{ opacity: 0, x: -10 }}
