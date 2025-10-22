@@ -1,0 +1,219 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Enable dark mode variant */
+@custom-variant dark (&:is(.dark *));
+
+/* -------------------------------
+   THEME VARIABLES
+-------------------------------- */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* -------------------------------
+   LIGHT THEME
+-------------------------------- */
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(220 40% 15%);
+
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(220 40% 15%);
+
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(220 40% 15%);
+
+  --primary: hsl(250 70% 60%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --secondary: hsl(170 60% 70%);
+  --secondary-foreground: hsl(220 40% 15%);
+
+  --muted: hsl(240 10% 96%);
+  --muted-foreground: hsl(220 20% 50%);
+
+  --accent: hsl(250 70% 95%);
+  --accent-foreground: hsl(250 70% 60%);
+
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --border: hsl(240 10% 90%);
+  --input: hsl(240 10% 90%);
+  --ring: hsl(250 70% 60%);
+
+  --radius: 0.75rem;
+
+  /* Gradient colors */
+  --gradient-start: 270 60% 92%;
+  --gradient-end: 170 60% 92%;
+
+  /* Sidebar */
+  --sidebar-background: hsl(0 0% 100%);
+  --sidebar-foreground: hsl(220 40% 15%);
+  --sidebar-primary: hsl(250 70% 60%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(250 70% 95%);
+  --sidebar-accent-foreground: hsl(250 70% 60%);
+  --sidebar-border: hsl(240 10% 90%);
+  --sidebar-ring: hsl(250 70% 60%);
+}
+
+/* -------------------------------
+   DARK THEME
+-------------------------------- */
+.dark {
+  --background: hsl(220 40% 15%);
+  --foreground: hsl(0 0% 100%);
+
+  --card: hsl(220 35% 18%);
+  --card-foreground: hsl(0 0% 100%);
+
+  --popover: hsl(220 35% 18%);
+  --popover-foreground: hsl(0 0% 100%);
+
+  --primary: hsl(250 70% 60%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --secondary: hsl(170 60% 70%);
+  --secondary-foreground: hsl(220 40% 15%);
+
+  --muted: hsl(220 30% 25%);
+  --muted-foreground: hsl(220 20% 70%);
+
+  --accent: hsl(250 70% 30%);
+  --accent-foreground: hsl(0 0% 100%);
+
+  --destructive: hsl(0 62.8% 30.6%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --border: hsl(220 30% 25%);
+  --input: hsl(220 30% 25%);
+  --ring: hsl(250 70% 60%);
+
+  /* Sidebar */
+  --sidebar-background: hsl(220 35% 18%);
+  --sidebar-foreground: hsl(0 0% 100%);
+  --sidebar-primary: hsl(250 70% 60%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(250 70% 30%);
+  --sidebar-accent-foreground: hsl(0 0% 100%);
+  --sidebar-border: hsl(220 30% 25%);
+  --sidebar-ring: hsl(250 70% 60%);
+}
+
+/* -------------------------------
+   BASE STYLES
+-------------------------------- */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: hsl(var(--foreground));
+    background-image: linear-gradient(
+      to bottom right,
+      hsl(var(--gradient-start)),
+      hsl(var(--gradient-end))
+    );
+  }
+}
+
+/* -------------------------------
+   UTILITIES
+-------------------------------- */
+@layer utilities {
+  .gradient-bg {
+    background-image: linear-gradient(
+      to bottom right,
+      hsl(var(--gradient-start)),
+      hsl(var(--gradient-end))
+    );
+  }
+
+  .navy-bg {
+    background-color: hsl(220 40% 15%);
+    color: hsl(0 0% 100%);
+  }
+}
+
+
+
+/* -------------------------------
+   CUSTOM CONTAINER CLASS
+-------------------------------- */
+@layer utilities {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  /* Responsive max-widths */
+  @media (min-width: 640px) {
+    .container {
+      max-width: 640px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      max-width: 768px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      max-width: 1024px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container {
+      max-width: 1280px;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .container {
+      max-width: 1400px; /* same as your desired 2xl breakpoint */
+    }
+  }
+}
