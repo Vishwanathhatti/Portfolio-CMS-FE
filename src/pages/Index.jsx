@@ -17,7 +17,7 @@ import { SmoothCursor } from "@/components/ui/smooth-cursor";
 const Index = () => {
   return (
     <div className="min-h-screen overflow-hidden">
-      <SmoothCursor className="hidden lg:block"/>
+      <SmoothCursor className="hidden md:block"/>
       <Header />
       <Hero />
       <About />
