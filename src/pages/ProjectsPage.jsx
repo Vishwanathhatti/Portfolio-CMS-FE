@@ -85,7 +85,7 @@ const ProjectsPage = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">{project.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{project.description?.length > 100 ? project.description.substring(0, 100) + '...' : project.description}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{project.description}</p>
                   <p className="text-sm text-muted-foreground mb-2"><span className="text-primary font-semibold">Technologies:</span> {project.technologies?.join(', ')}</p>
                   <h5 className="text-sm text-muted-foreground mb-2"><span className="text-primary font-semibold">Features:</span></h5>
                   <ul className="text-sm text-muted-foreground mb-4 list-disc list-inside">

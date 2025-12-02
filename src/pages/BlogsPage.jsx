@@ -1,4 +1,5 @@
-import { Calendar } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Calendar, Search, Eye, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -7,8 +8,11 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
 import ScrollProgress from "@/components/ScrollProgress";
+import { Input } from "@/components/ui/input";
 
 const BlogsPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { data: blogs, isLoading } = useQuery({
     queryKey: ['blogs'],
     queryFn: async () => {
@@ -19,7 +23,7 @@ const BlogsPage = () => {
 
   const defaultPosts = [];
 
-  const posts = blogs && blogs.length > 0 ? blogs.map(blog => ({
+  const allPosts = blogs && blogs.length > 0 ? blogs.map(blog => ({
     id: blog._id,
     title: blog.title,
     date: new Date(blog.createdAt).toLocaleDateString('en-US', {
@@ -27,9 +31,22 @@ const BlogsPage = () => {
       month: 'long',
       day: 'numeric'
     }).toUpperCase(),
-    image: blog.imgUrl ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'}${blog.imgUrl}` : "/assets/blog-3.jpg",
-    excerpt: blog.content.substring(0, 100) + "..."
+    image: `${import.meta.env.VITE_API_BASE_URL.replace('/api','')}${blog.imgUrl}`,
+    excerpt: blog.content.substring(0, 100) + "...",
+    tags: blog.tags || [],
+    views: blog.views || 0,
+    readTime: Math.ceil(blog.content.split(' ').length / 200) // Assuming 200 words per minute
   })) : defaultPosts;
+
+  const filteredPosts = useMemo(() => {
+    if (!searchTerm.trim()) return allPosts;
+
+    return allPosts.filter(post =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [allPosts, searchTerm]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -67,9 +84,20 @@ const BlogsPage = () => {
             className="text-center mb-16"
           >
             <h1 className="text-4xl md:text-5xl font-bold mb-4">All Blog Posts</h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
               Explore articles about design, development, and creativity.
             </p>
+
+            <div className="relative max-w-md mx-auto">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                type="text"
+                placeholder="Search blogs by title, content, or tags..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-3 rounded-full border-2 focus:border-primary bg-[#ffffffcd] transition-colors"
+              />
+            </div>
           </motion.div>
 
           <motion.div
@@ -78,35 +106,59 @@ const BlogsPage = () => {
             animate="visible"
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {posts.map((post) => (
-              <motion.div
-                key={post.id}
-                variants={itemVariants}
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Link 
-                  to={`/blog/${post.id}`}
-                  className="block bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"
+            {filteredPosts.length === 0 && searchTerm.trim() ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground text-lg">No blogs found matching "{searchTerm}"</p>
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="mt-4 text-primary hover:underline"
                 >
-                  <div className="aspect-video overflow-hidden">
-                    <img 
-                      src={post.image} 
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                      <Calendar className="w-4 h-4" />
-                      <span>{post.date}</span>
+                  Clear search
+                </button>
+              </div>
+            ) : (
+              filteredPosts.map((post) => (
+                <motion.div
+                  key={post.id}
+                  variants={itemVariants}
+                  whileHover={{ y: -8 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Link
+                    to={`/blog/${post.id}`}
+                    className="block bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group"
+                  >
+                    <div className="aspect-video overflow-hidden">
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
                     </div>
-                    <h3 className="text-xl font-bold mb-2">{post.title}</h3>
-                    <p className="text-muted-foreground text-sm">{post.excerpt}</p>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+                    <div className="p-6">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>{post.date}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1">
+                            <Eye className="w-4 h-4" />
+                            <span>{post.views}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            <span>{post.readTime} min</span>
+                          </div>
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">{post.title}</h3>
+                      <p className="text-muted-foreground text-sm">{post.excerpt}</p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))
+            )}
           </motion.div>
         </div>
       </main>

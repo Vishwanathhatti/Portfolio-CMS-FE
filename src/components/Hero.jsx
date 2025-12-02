@@ -13,6 +13,67 @@ const Hero = () => {
     },
   });
 
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const response = await api.getProjects();
+      return response.data.data;
+    },
+  });
+
+  const { data: experiences } = useQuery({
+    queryKey: ['experiences'],
+    queryFn: async () => {
+      const response = await api.getExperiences();
+      return response.data.data;
+    },
+  });
+
+  const { data: testimonials } = useQuery({
+    queryKey: ['testimonials'],
+    queryFn: async () => {
+      const response = await api.getTestimonials();
+      return response.data.data;
+    },
+  });
+
+  // Calculate years of experience
+  const calculateYearsOfExperience = () => {
+    if (!experiences || experiences.length === 0) return { value: 0, unit: 'Y' };
+
+    const earliestDate = experiences.reduce((earliest, exp) => {
+      const startDate = new Date(exp.startDate);
+      return startDate < earliest ? startDate : earliest;
+    }, new Date());
+
+    const totalMonths = ((new Date() - earliestDate) / (1000 * 60 * 60 * 24 * 30.44));
+    const years = Math.floor(totalMonths / 12);
+    const months = Math.floor(totalMonths);
+
+    if (years >= 1) {
+      return { value: years, unit: 'Yrs' };
+    } else {
+      return { value: months, unit: 'M' };
+    }
+  };
+
+  const experienceData = calculateYearsOfExperience();
+
+  const stats = [
+    {
+      value: `${experienceData.value} ${experienceData.unit}+`,
+      label: "Experience"
+    },
+    {
+      value: `${projects?.length || 0}+`,
+      label: "Projects Completed"
+    },
+    {
+      value: `${testimonials?.length || 0}+`,
+      label: "Happy Clients"
+    }
+  ];
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -62,20 +123,16 @@ const Hero = () => {
             </motion.div>
 
             <motion.div
-              className="grid grid-cols-3 gap-8 mt-12"
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 "
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
             >
-              {[
-                { value: "1Y+", label: "Experience" },
-                { value: "10+", label: "Projects Completed" },
-                { value: "5+", label: "Happy Clients" }
-              ].map((stat, index) => (
+              {stats.map((stat, index) => (
                 <motion.div
                   key={index}
                   variants={fadeInUp}
-                  className="bg-card p-6 rounded-2xl shadow-sm"
+                  className="bg-card p-6 rounded-2xl shadow-sm text-center"
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 >
                   <h3 className="text-3xl font-bold text-primary mb-1">{stat.value}</h3>

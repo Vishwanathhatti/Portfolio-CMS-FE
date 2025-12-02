@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const ContactForm = ({ onSubmit, isLoading }) => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const ContactForm = ({ onSubmit, isLoading }) => {
     subject: "",
     message: "",
   });
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,9 +21,20 @@ const ContactForm = ({ onSubmit, isLoading }) => {
     }));
   };
 
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    if (!captchaToken) {
+      alert("Please complete the CAPTCHA verification");
+      return;
+    }
+
+    onSubmit({ ...formData, captchaToken });
+
     // Reset form after successful submission
     setFormData({
       fullname: "",
@@ -29,6 +42,7 @@ const ContactForm = ({ onSubmit, isLoading }) => {
       subject: "",
       message: "",
     });
+    setCaptchaToken(null);
   };
 
   return (
@@ -69,10 +83,19 @@ const ContactForm = ({ onSubmit, isLoading }) => {
         onChange={handleChange}
         required
       />
+
+      <div className="flex justify-center">
+        <ReCAPTCHA
+          sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"}
+          onChange={handleCaptchaChange}
+          theme="light"
+        />
+      </div>
+
       <Button
         type="submit"
         className="w-full rounded-full"
-        disabled={isLoading}
+        disabled={isLoading || !captchaToken}
       >
         {isLoading ? "Sending..." : "Send Message"}
       </Button>

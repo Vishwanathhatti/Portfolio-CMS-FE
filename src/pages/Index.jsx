@@ -13,6 +13,7 @@ import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { SmoothCursor } from "@/components/ui/smooth-cursor";
+import ProjectLayout from "@/components/ProjectLayout";
 
 const Index = () => {
   return (
@@ -24,11 +25,12 @@ const Index = () => {
       <Skills />
       <Experience />
       <WorkProcess />
-      <Portfolio />
+      {/* <Portfolio /> */}
+      <ProjectLayout/>
       <CTA />
       <Blog />
       <Services />
-      <Clients />
+      {/* <Clients /> */}
       <Testimonials />
       <Contact />
       <Footer />
